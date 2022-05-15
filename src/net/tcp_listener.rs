@@ -1,8 +1,10 @@
-use std::io::{Error, ErrorKind, Result};
-use std::net::SocketAddr;
+use core2::io::{Error, ErrorKind,Result};
+
+use no_std_net::{SocketAddr,ToSocketAddrError};
 
 use super::SocketAddrIterator;
 use crate::{error::LunaticError, host, net::TcpStream};
+use alloc::boxed::Box;
 
 /// A TCP server, listening for connections.
 ///
@@ -103,7 +105,7 @@ impl TcpListener {
             }
         }
         let lunatic_error = LunaticError::from(id);
-        Err(Error::new(ErrorKind::Other, lunatic_error))
+        Err(Error::new(ErrorKind::Other, ""))
     }
 
     /// Accepts a new incoming connection.
@@ -126,7 +128,7 @@ impl TcpListener {
             Ok((tcp_stream, peer))
         } else {
             let lunatic_error = LunaticError::from(tcp_stream_or_error_id);
-            Err(Error::new(ErrorKind::Other, lunatic_error))
+            Err(Error::new(ErrorKind::Other, ""))
         }
     }
 
@@ -144,7 +146,7 @@ impl TcpListener {
             Ok(addr)
         } else {
             let lunatic_error = LunaticError::from(dns_iter_or_error_id);
-            Err(Error::new(ErrorKind::Other, lunatic_error))
+            Err(Error::new(ErrorKind::Other, ""))
         }
     }
 }

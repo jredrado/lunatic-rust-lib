@@ -37,6 +37,7 @@ dependencies = [
  "core2",
  "lunatic-macros",
  "lunatic-test",
+ "no-std-net",
  "paste",
  "serde",
  "thiserror_core2",
@@ -63,6 +64,11 @@ name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
+
+[[package]]
+name = "no-std-net"
+version = "0.6.1"
+source = "git+https://github.com/jredrado/no-std-net.git?branch=master#f6851072af003d86aadd0256e44ed0923fc48944"
 
 [[package]]
 name = "paste"

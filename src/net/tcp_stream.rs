@@ -1,9 +1,9 @@
-use std::{
-    cell::UnsafeCell,
-    io::{Error, ErrorKind, IoSlice, Read, Result, Write},
-    net::SocketAddr,
-    time::Duration,
-};
+
+use core::cell::UnsafeCell;
+use core2::io::{Error, ErrorKind, Read, Result, Write};
+use no_std_net::SocketAddr;
+use core::time::Duration;
+
 
 use serde::{
     de::{self, Visitor},
@@ -57,7 +57,7 @@ impl Clone for TcpStream {
 }
 
 impl Serialize for TcpStream {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
@@ -72,11 +72,11 @@ struct TcpStreamVisitor;
 impl<'de> Visitor<'de> for TcpStreamVisitor {
     type Value = TcpStream;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
         formatter.write_str("an u64 index")
     }
 
-    fn visit_u64<E>(self, index: u64) -> std::result::Result<Self::Value, E>
+    fn visit_u64<E>(self, index: u64) -> core::result::Result<Self::Value, E>
     where
         E: de::Error,
     {
@@ -86,7 +86,7 @@ impl<'de> Visitor<'de> for TcpStreamVisitor {
 }
 
 impl<'de> Deserialize<'de> for TcpStream {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<TcpStream, D::Error>
+    fn deserialize<D>(deserializer: D) -> core::result::Result<TcpStream, D::Error>
     where
         D: Deserializer<'de>,
     {
@@ -199,23 +199,18 @@ impl TcpStream {
             }
         }
         let lunatic_error = LunaticError::from(id);
-        Err(Error::new(ErrorKind::Other, lunatic_error))
+        Err(Error::new(ErrorKind::Other, ""))
     }
 }
 
 impl Write for TcpStream {
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
-        let io_slice = IoSlice::new(buf);
-        self.write_vectored(&[io_slice])
-    }
-
-    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> Result<usize> {
         let mut nwritten_or_error_id: u64 = 0;
         let result = unsafe {
             host::api::networking::tcp_write_vectored(
                 self.id,
-                bufs.as_ptr() as *const u32,
-                bufs.len(),
+                buf.as_ptr() as *const u32,
+                buf.len(),
                 self.write_timeout,
                 &mut nwritten_or_error_id as *mut u64,
             )
@@ -224,7 +219,7 @@ impl Write for TcpStream {
             Ok(nwritten_or_error_id as usize)
         } else {
             let lunatic_error = LunaticError::from(nwritten_or_error_id);
-            Err(Error::new(ErrorKind::Other, lunatic_error))
+            Err(Error::new(ErrorKind::Other, ""))
         }
     }
 
@@ -234,7 +229,7 @@ impl Write for TcpStream {
             0 => Ok(()),
             _ => {
                 let lunatic_error = LunaticError::from(error_id);
-                Err(Error::new(ErrorKind::Other, lunatic_error))
+                Err(Error::new(ErrorKind::Other, ""))
             }
         }
     }
@@ -256,7 +251,7 @@ impl Read for TcpStream {
             Ok(nread_or_error_id as usize)
         } else {
             let lunatic_error = LunaticError::from(nread_or_error_id);
-            Err(Error::new(ErrorKind::Other, lunatic_error))
+            Err(Error::new(ErrorKind::Other, ""))
         }
     }
 }

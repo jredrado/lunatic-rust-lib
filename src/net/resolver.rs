@@ -1,8 +1,6 @@
-use std::{
-    net::{Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
-    time::Duration,
-};
+use no_std_net::{Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 
+use core::time::Duration;
 use crate::{error::LunaticError, host};
 
 /// Iterator over [`SocketAddr`]

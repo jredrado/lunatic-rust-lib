@@ -101,7 +101,8 @@ mod module;
 mod tag;
 
 pub mod host;
-//pub mod net;
+pub mod net;
+
 pub mod process;
 pub mod protocol;
 pub mod serializer;

@@ -4,15 +4,18 @@ mod resolver;
 mod tcp_listener;
 mod tcp_stream;
 
-use std::io::{Error, ErrorKind, Result};
-use std::iter::Cloned;
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
-use std::option::IntoIter;
-use std::slice::Iter;
+use core2::io::{Error, ErrorKind,Result};
+use core::iter::Cloned;
+use no_std_net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6,ToSocketAddrError};
+use core::option::IntoIter;
+use core::slice::Iter;
 
 pub use resolver::{resolve, resolve_timeout, SocketAddrIterator};
 pub use tcp_listener::TcpListener;
 pub use tcp_stream::TcpStream;
+
+use alloc::string::String;
+
 
 /// A trait for objects which can be converted or resolved to one or more
 /// [`SocketAddr`] values.
@@ -55,7 +58,7 @@ pub use tcp_stream::TcpStream;
 ///
 /// ```
 /// use lunatic::net::ToSocketAddrs;
-/// use std::net::SocketAddr;
+/// use no_std_net::SocketAddr;
 ///
 /// let addr = SocketAddr::from(([127, 0, 0, 1], 443));
 /// let mut addrs_iter = addr.to_socket_addrs().unwrap();
@@ -67,7 +70,7 @@ pub use tcp_stream::TcpStream;
 /// Creating a [`SocketAddr`] iterator from a hostname:
 ///
 /// ```no_run
-/// use std::net::SocketAddr;
+/// use no_std_net::SocketAddr;
 /// use lunatic::net::ToSocketAddrs;
 ///
 /// // assuming 'localhost' resolves to 127.0.0.1
@@ -82,7 +85,7 @@ pub use tcp_stream::TcpStream;
 /// Creating a [`SocketAddr`] iterator that yields multiple items:
 ///
 /// ```
-/// use std::net::SocketAddr;
+/// use no_std_net::SocketAddr;
 /// use lunatic::net::ToSocketAddrs;
 ///
 /// let addr1 = SocketAddr::from(([0, 0, 0, 0], 80));
@@ -113,7 +116,7 @@ pub use tcp_stream::TcpStream;
 ///
 /// ```no_run
 /// use lunatic::net::TcpStream;
-/// use std::net::Ipv4Addr;
+/// use no_std_net::Ipv4Addr;
 /// // or
 /// let stream = TcpStream::connect("127.0.0.1:443");
 /// // or
@@ -122,7 +125,7 @@ pub use tcp_stream::TcpStream;
 ///
 /// [`TcpStream::connect`]: TcpStream::connect
 pub trait ToSocketAddrs {
-    type Iter: Iterator<Item = std::net::SocketAddr>;
+    type Iter: Iterator<Item = no_std_net::SocketAddr>;
     fn to_socket_addrs(&self) -> Result<Self::Iter>;
 }
 
@@ -132,7 +135,7 @@ impl ToSocketAddrs for &str {
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
         match resolve(self) {
             Ok(iter) => Ok(iter),
-            Err(err) => Err(Error::new(ErrorKind::Other, err)),
+            Err(err) => Err(Error::new(ErrorKind::Other, "")),
         }
     }
 }
@@ -143,7 +146,7 @@ impl ToSocketAddrs for String {
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
         match resolve(self) {
             Ok(iter) => Ok(iter),
-            Err(err) => Err(Error::new(ErrorKind::Other, err)),
+            Err(err) => Err(Error::new(ErrorKind::Other, "")),
         }
     }
 }
@@ -153,48 +156,48 @@ impl ToSocketAddrs for String {
 impl ToSocketAddrs for SocketAddr {
     type Iter = IntoIter<SocketAddr>;
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
-        <SocketAddr as std::net::ToSocketAddrs>::to_socket_addrs(self)
+        <SocketAddr as no_std_net::ToSocketAddrs>::to_socket_addrs(self).map_err(|err| Error::new(ErrorKind::Other,""))
     }
 }
 
 impl ToSocketAddrs for (IpAddr, u16) {
     type Iter = IntoIter<SocketAddr>;
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
-        <(IpAddr, u16) as std::net::ToSocketAddrs>::to_socket_addrs(self)
+        <(IpAddr, u16) as no_std_net::ToSocketAddrs>::to_socket_addrs(self).map_err(|err| Error::new(ErrorKind::Other,""))
     }
 }
 
 impl ToSocketAddrs for (Ipv4Addr, u16) {
     type Iter = IntoIter<SocketAddr>;
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
-        <(Ipv4Addr, u16) as std::net::ToSocketAddrs>::to_socket_addrs(self)
+        <(Ipv4Addr, u16) as no_std_net::ToSocketAddrs>::to_socket_addrs(self).map_err(|err| Error::new(ErrorKind::Other,""))
     }
 }
 
 impl ToSocketAddrs for (Ipv6Addr, u16) {
     type Iter = IntoIter<SocketAddr>;
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
-        <(Ipv6Addr, u16) as std::net::ToSocketAddrs>::to_socket_addrs(self)
+        <(Ipv6Addr, u16) as no_std_net::ToSocketAddrs>::to_socket_addrs(self).map_err(|err| Error::new(ErrorKind::Other,""))
     }
 }
 
 impl ToSocketAddrs for SocketAddrV4 {
     type Iter = IntoIter<SocketAddr>;
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
-        <SocketAddrV4 as std::net::ToSocketAddrs>::to_socket_addrs(self)
+        <SocketAddrV4 as no_std_net::ToSocketAddrs>::to_socket_addrs(self).map_err(|err| Error::new(ErrorKind::Other,""))
     }
 }
 
 impl ToSocketAddrs for SocketAddrV6 {
     type Iter = IntoIter<SocketAddr>;
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
-        <SocketAddrV6 as std::net::ToSocketAddrs>::to_socket_addrs(self)
+        <SocketAddrV6 as no_std_net::ToSocketAddrs>::to_socket_addrs(self).map_err(|err| Error::new(ErrorKind::Other,""))
     }
 }
 
 impl<'a> ToSocketAddrs for &'a [SocketAddr] {
     type Iter = Cloned<Iter<'a, SocketAddr>>;
     fn to_socket_addrs(&self) -> Result<Self::Iter> {
-        <&[SocketAddr] as std::net::ToSocketAddrs>::to_socket_addrs(self)
+        <&[SocketAddr] as no_std_net::ToSocketAddrs>::to_socket_addrs(self).map_err(|err| Error::new(ErrorKind::Other,""))
     }
 }
