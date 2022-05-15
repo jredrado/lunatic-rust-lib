@@ -1,4 +1,4 @@
-use std::{any::TypeId, marker::PhantomData, mem::ManuallyDrop};
+use core::{any::TypeId, marker::PhantomData, mem::ManuallyDrop};
 
 use crate::{
     function_process::IntoProcess,
@@ -36,7 +36,7 @@ impl<P: 'static, S> Drop for Protocol<P, S> {
         {
             panic!(
                 "Protocol prematurely dropped, before reaching the `End` or `TaskEnd` state (currently: {}).",
-                std::any::type_name::<P>()
+                core::any::type_name::<P>()
             );
         }
         unsafe { host::api::process::drop_process(self.id) };
@@ -280,7 +280,7 @@ where
     let p_capture = unsafe { Mailbox::<ProtocolCapture<C>, S>::new() }.receive();
     let capture = p_capture.capture;
     let procotol = Protocol::from_process(p_capture.process, p_capture.tag);
-    let function: fn(C, Protocol<P, S>) = unsafe { std::mem::transmute(function) };
+    let function: fn(C, Protocol<P, S>) = unsafe { core::mem::transmute(function) };
     function(capture, procotol);
 }
 

@@ -1,6 +1,7 @@
 use crate::host::api::error;
-use std::fmt::{Debug, Display, Formatter};
-use thiserror::Error;
+use core::fmt::{Debug, Display, Formatter};
+use thiserror_core2::Error;
+use alloc::vec;
 
 /// An opaque error returned from host calls.
 ///
@@ -32,13 +33,13 @@ impl LunaticError {
 }
 
 impl Debug for LunaticError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
         match self {
             LunaticError::Error(id) => {
                 let size = unsafe { error::string_size(*id) };
                 let mut buff = vec![0; size as usize];
                 unsafe { error::to_string(*id, buff.as_mut_ptr()) };
-                let error = std::str::from_utf8(&buff).unwrap();
+                let error = core::str::from_utf8(&buff).unwrap();
                 write!(f, "{}", error)
             }
             LunaticError::PermissionDenied => write!(f, "Permission denied"),
@@ -47,13 +48,13 @@ impl Debug for LunaticError {
 }
 
 impl Display for LunaticError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
         match self {
             LunaticError::Error(id) => {
                 let size = unsafe { error::string_size(*id) };
                 let mut buff = vec![0; size as usize];
                 unsafe { error::to_string(*id, buff.as_mut_ptr()) };
-                let error = std::str::from_utf8(&buff).unwrap();
+                let error = core::str::from_utf8(&buff).unwrap();
                 write!(f, "{}", error)
             }
             LunaticError::PermissionDenied => write!(f, "Permission denied"),

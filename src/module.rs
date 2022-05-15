@@ -1,4 +1,5 @@
-use std::u128;
+use core::u128;
+use alloc::vec::Vec;
 
 use crate::{error::LunaticError, host, serializer::Serializer, Process, Resource};
 

@@ -2,18 +2,21 @@
 
 use crate::host::api::message;
 
-use thiserror::Error;
+use thiserror_core2::Error;
+use alloc::string::String;
+
+use bincode2 as bincode;
 
 #[derive(Error, Debug)]
 pub enum EncodeError {
     #[error("serialization to Bincode failed: {0}")]
     Bincode(#[from] bincode::Error),
-    #[error("serialization to MessagePack failed: {0}")]
-    MessagePack(#[from] rmp_serde::encode::Error),
-    #[error("serialization to Json failed: {0}")]
-    Json(#[from] serde_json::error::Error),
-    #[error("serialization to Protocol Buffers failed: {0}")]
-    ProtocolBuffers(#[from] protobuf::error::ProtobufError),
+    //#[error("serialization to MessagePack failed: {0}")]
+    //MessagePack(#[from] rmp_serde::encode::Error),
+    //#[error("serialization to Json failed: {0}")]
+    //Json(#[from] serde_json::error::Error),
+    //#[error("serialization to Protocol Buffers failed: {0}")]
+    //ProtocolBuffers(#[from] protobuf::error::ProtobufError),
     #[error("serialization failed: {0}")]
     Custom(String),
 }
@@ -22,12 +25,12 @@ pub enum EncodeError {
 pub enum DecodeError {
     #[error("deserialization from Bincode failed: {0}")]
     Bincode(#[from] bincode::Error),
-    #[error("deserialization from MessagePack failed: {0}")]
-    MessagePack(#[from] rmp_serde::decode::Error),
-    #[error("deserialization from Json failed: {0}")]
-    Json(#[from] serde_json::error::Error),
-    #[error("deserialization from Protocol Buffers failed: {0}")]
-    ProtocolBuffers(#[from] protobuf::error::ProtobufError),
+    //#[error("deserialization from MessagePack failed: {0}")]
+    //MessagePack(#[from] rmp_serde::decode::Error),
+    //#[error("deserialization from Json failed: {0}")]
+    //Json(#[from] serde_json::error::Error),
+    //#[error("deserialization from Protocol Buffers failed: {0}")]
+    //ProtocolBuffers(#[from] protobuf::error::ProtobufError),
     #[error("deserialization failed: {0}")]
     Custom(String),
 }
@@ -72,6 +75,8 @@ pub trait Serializer<M> {
 /// messages are extracted from a stream that lives inside of the VM, has an unknown lifetime and
 /// can't be referenced from the guest. `serde::de::DeserializeOwned` is automatically implemented
 /// for each type that also implements `serde::Deserialize<'de>`.
+
+
 pub struct Bincode {}
 
 impl<M> Serializer<M> for Bincode
@@ -79,13 +84,19 @@ where
     M: serde::Serialize + serde::de::DeserializeOwned,
 {
     fn encode(message: &M) -> Result<(), EncodeError> {
-        bincode::serialize_into(MessageRw {}, message).map_err(|err| err.into())
+        bincode::serialize_into(MessageRw {}, message).map_err(|err| EncodeError::Bincode(err))
+        //let config = bincode::config::standard();
+        //bincode::serde::encode_into_writer(message,MessageRw{},config)
     }
 
     fn decode() -> Result<M, DecodeError> {
-        bincode::deserialize_from(MessageRw {}).map_err(|err| err.into())
+        //let config = bincode::config::standard();
+        //bincode::serde::decode_from_reader(MessageRw {},config)
+        bincode::deserialize_from(MessageRw{}).map_err(|err| DecodeError::Bincode(err))
     }
 }
+
+
 
 /// A `MessagePack` serializer.
 ///
@@ -95,6 +106,7 @@ where
 ///
 /// Refer to the [`Bincode`] docs for the difference between `serde::de::DeserializeOwned` and
 /// `serde::Deserialize<'de>`.
+/*
 pub struct MessagePack {}
 
 impl<M> Serializer<M> for MessagePack
@@ -103,12 +115,16 @@ where
 {
     fn encode(message: &M) -> Result<(), EncodeError> {
         rmp_serde::encode::write(&mut MessageRw {}, message).map_err(|err| err.into())
+        
     }
 
     fn decode() -> Result<M, DecodeError> {
         rmp_serde::decode::from_read(MessageRw {}).map_err(|err| err.into())
+        
     }
 }
+
+*/
 
 /// A `Json` serializer.
 ///
@@ -118,6 +134,7 @@ where
 ///
 /// Refer to the [`Bincode`] docs for the difference between `serde::de::DeserializeOwned` and
 /// `serde::Deserialize<'de>`.
+/*
 pub struct Json {}
 
 impl<M> Serializer<M> for Json
@@ -132,9 +149,11 @@ where
         serde_json::from_reader(MessageRw {}).map_err(|err| err.into())
     }
 }
+*/
 
 /// The `ProtocolBuffers` serializer can serialize any message that satisfies the trait
 /// `protobuf::Message`.
+/*
 pub struct ProtocolBuffers {}
 
 impl<M> Serializer<M> for ProtocolBuffers
@@ -151,6 +170,7 @@ where
         M::parse_from_reader(&mut MessageRw {}).map_err(|err| err.into())
     }
 }
+*/
 
 /// A helper struct to read from and write to the message scratch buffer.
 ///
@@ -158,18 +178,37 @@ where
 /// Most serde based serializers can work directly with streaming serialization.
 pub struct MessageRw {}
 
-impl std::io::Read for MessageRw {
-    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+
+impl core2::io::Read for MessageRw {
+    fn read(&mut self, buf: &mut [u8]) -> core2::io::Result<usize> {
         Ok(unsafe { message::read_data(buf.as_mut_ptr(), buf.len()) })
     }
 }
 
-impl std::io::Write for MessageRw {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+impl core2::io::Write for MessageRw {
+    fn write(&mut self, buf: &[u8]) -> core2::io::Result<usize> {
         Ok(unsafe { message::write_data(buf.as_ptr(), buf.len()) })
     }
 
-    fn flush(&mut self) -> std::io::Result<()> {
+    fn flush(&mut self) -> core2::io::Result<()> {
         Ok(())
     }
 }
+
+/*
+use bincode::enc::write::Writer;
+use bincode::de::read::Reader;
+
+impl Writer for MessageRw {
+    #[inline]
+    fn write(&mut self, bytes: &[u8]) -> Result<(), bincode::error::EncodeError> {
+        Ok(unsafe { message::write_data(bytes.as_ptr(), bytes.len()); })
+    }
+}
+
+impl Reader for MessageRw {
+    fn read(&mut self, bytes: &mut [u8]) -> Result<(), bincode::error::DecodeError>{
+        Ok(unsafe { message::read_data(bytes.as_mut_ptr(), bytes.len()); })
+    }
+}
+*/

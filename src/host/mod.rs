@@ -52,6 +52,6 @@ pub(crate) fn spawn(
 
 #[export_name = "_lunatic_spawn_by_index"]
 extern "C" fn _lunatic_spawn_by_index(function: i32, arg: i32) {
-    let function: fn(i32) = unsafe { std::mem::transmute(function) };
+    let function: fn(i32) = unsafe { core::mem::transmute(function) };
     function(arg);
 }

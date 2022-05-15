@@ -1,7 +1,9 @@
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 use crate::process::{AbstractProcess, ProcessRef, StartFailableProcess};
 use crate::{host, Tag};
+
+use alloc::string::String;
 
 /// A `Supervisor` can detect failures (panics) inside [`AbstractProcesses`](AbstractProcess) and
 /// restart them.
@@ -70,7 +72,7 @@ where
         if config.children_args.is_none() {
             panic!(
                 "SupervisorConfig<{0}>::children_args not set inside `{0}:init` function.",
-                std::any::type_name::<T>()
+                core::any::type_name::<T>()
             );
         }
 
@@ -168,7 +170,7 @@ where
             Ok(result) => result,
             Err(_) => panic!(
                 "Supervisor failed to start child `{}`",
-                std::any::type_name::<T1>()
+                core::any::type_name::<T1>()
             ),
         };
         config.children = Some(proc);
@@ -191,7 +193,7 @@ where
                         Ok(result) => result,
                         Err(_) => panic!(
                             "Supervisor failed to start child `{}`",
-                            std::any::type_name::<T1>()
+                            core::any::type_name::<T1>()
                         ),
                     };
                     *config.children.as_mut().unwrap() = proc;
@@ -199,7 +201,7 @@ where
                 } else {
                     panic!(
                         "Supervisor {} received kill signal",
-                        std::any::type_name::<K>()
+                        core::any::type_name::<K>()
                     );
                 }
             }
@@ -252,7 +254,7 @@ mod macros {
                             Ok(result) => result,
                             Err(_) => panic!(
                                 "Supervisor failed to start child `{}`",
-                                std::any::type_name::<$args>()
+                                core::any::type_name::<$args>()
                             ),
                         };
                     )*
@@ -280,7 +282,7 @@ mod macros {
                                         Ok(result) => result,
                                         Err(_) => panic!(
                                             "Supervisor failed to start child `{}`",
-                                            std::any::type_name::<$args>()
+                                            core::any::type_name::<$args>()
                                         ),
                                     };
                                     (*config.children.as_mut().unwrap()).$i = proc;
@@ -292,7 +294,7 @@ mod macros {
                             {
                                 panic!(
                                     "Supervisor {} received kill signal",
-                                    std::any::type_name::<K>()
+                                    core::any::type_name::<K>()
                                 );
                             }
                         }
@@ -308,7 +310,7 @@ mod macros {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
+    use core::time::Duration;
 
     use lunatic_test::test;
 

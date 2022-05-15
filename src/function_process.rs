@@ -1,7 +1,7 @@
 //! As the name suggests, a "function" process can be spawned just from a function. Opposite of a
 //! `AbstractProcess` that requires a `struct`.
 
-use std::{cell::UnsafeCell, marker::PhantomData};
+use core::{cell::UnsafeCell, marker::PhantomData};
 
 use crate::{
     host,
@@ -205,22 +205,22 @@ impl<M, S> Process<M, S> {
     /// Register process under a name.
     pub fn register(&self, name: &str) {
         // Encode type information in name
-        let name = format!(
+        let name = alloc::format!(
             "{} + Process + {}/{}",
             name,
-            std::any::type_name::<M>(),
-            std::any::type_name::<S>()
+            core::any::type_name::<M>(),
+            core::any::type_name::<S>()
         );
         unsafe { host::api::registry::put(name.as_ptr(), name.len(), self.id) };
     }
 
     /// Look up a process.
     pub fn lookup(name: &str) -> Option<Self> {
-        let name = format!(
+        let name = alloc::format!(
             "{} + Process + {}/{}",
             name,
-            std::any::type_name::<M>(),
-            std::any::type_name::<S>()
+            core::any::type_name::<M>(),
+            core::any::type_name::<S>()
         );
         let mut id = 0;
         let result = unsafe { host::api::registry::get(name.as_ptr(), name.len(), &mut id) };
@@ -298,8 +298,8 @@ impl<M, S> PartialEq for Process<M, S> {
     }
 }
 
-impl<M, S> std::fmt::Debug for Process<M, S> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<M, S> core::fmt::Debug for Process<M, S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("Process")
             .field("uuid", &self.uuid())
             .finish()
@@ -342,7 +342,7 @@ struct ProcessVisitor<M, S> {
 impl<'de, M, S> serde::de::Visitor<'de> for ProcessVisitor<M, S> {
     type Value = Process<M, S>;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
         formatter.write_str("an u64 index")
     }
 

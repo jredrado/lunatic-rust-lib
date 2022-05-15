@@ -101,7 +101,7 @@ fn task() {
 
     let a = "hello".to_owned();
     let b = "world".to_owned();
-    let task = spawn_link!(@task |a, b| format!("{} {}",a, b));
+    let task = spawn_link!(@task |a, b| alloc::format!("{} {}",a, b));
     assert_eq!(task.result(), "hello world");
 }
 
@@ -117,7 +117,7 @@ fn task_config() {
 
     let a = "hello".to_owned();
     let b = "world".to_owned();
-    let task = spawn_link!(@task &config, |a, b| format!("{} {}",a, b));
+    let task = spawn_link!(@task &config, |a, b| alloc::format!("{} {}",a, b));
     assert_eq!(task.result(), "hello world");
 }
 

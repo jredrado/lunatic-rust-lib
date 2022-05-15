@@ -1,5 +1,6 @@
 #[allow(unused_extern_crates)]
 extern crate proc_macro;
+extern crate alloc;
 
 use proc_macro::TokenStream;
 use quote::quote;
@@ -70,11 +71,11 @@ pub fn test(_args: TokenStream, item: TokenStream) -> TokenStream {
         }
     }
 
-    let mut export_name = format!("#lunatic_test_{}", ignore);
+    let mut export_name = alloc::format!("#lunatic_test_{}", ignore);
     if let Some(panic_str) = should_panic {
         // Escape # in panic_str
         let panic_str = panic_str.replace('#', "\\#");
-        export_name = format!("{}#panic_{}#", export_name, panic_str,);
+        export_name = alloc::format!("{}#panic_{}#", export_name, panic_str,);
     }
     let function_name = input.sig.ident.to_string();
 

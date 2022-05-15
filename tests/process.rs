@@ -1,4 +1,4 @@
-use std::time::Duration;
+use core::time::Duration;
 
 use lunatic::{spawn_link, Mailbox, Process, ProcessConfig};
 use lunatic_test::test;

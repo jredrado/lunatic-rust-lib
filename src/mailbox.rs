@@ -1,6 +1,7 @@
-use std::{marker::PhantomData, time::Duration};
+use core::{marker::PhantomData, time::Duration};
+use alloc::vec::Vec;
 
-use thiserror::Error;
+use thiserror_core2::Error;
 
 use crate::{
     function_process::{IntoProcess, NoLink},
@@ -232,14 +233,14 @@ where
         match host::spawn(config, link, type_helper_wrapper::<C, M, S>, entry) {
             Ok(id) => {
                 // If the captured variable is of size 0, we don't need to send it to another process.
-                if std::mem::size_of::<C>() == 0 {
+                if core::mem::size_of::<C>() == 0 {
                     unsafe { Process::from_id(id) }
                 } else {
                     let child = unsafe { Process::<C, S>::from_id(id) };
                     child.send(capture);
                     // Processes can only receive one type of message, but to pass in the captured variable
                     // we pretend for the first message that our process is receiving messages of type `C`.
-                    unsafe { std::mem::transmute(child) }
+                    unsafe { core::mem::transmute(child) }
                 }
             }
             Err(err) => panic!("Failed to spawn a process: {}", err),
@@ -253,20 +254,20 @@ where
     S: Serializer<C> + Serializer<M>,
 {
     // If the captured variable is of size 0, don't wait on it.
-    let captured = if std::mem::size_of::<C>() == 0 {
-        unsafe { std::mem::MaybeUninit::<C>::zeroed().assume_init() }
+    let captured = if core::mem::size_of::<C>() == 0 {
+        unsafe { core::mem::MaybeUninit::<C>::zeroed().assume_init() }
     } else {
         unsafe { Mailbox::<C, S>::new() }.receive()
     };
     let mailbox = unsafe { Mailbox::new() };
-    let function: fn(C, Mailbox<M, S>) = unsafe { std::mem::transmute(function) };
+    let function: fn(C, Mailbox<M, S>) = unsafe { core::mem::transmute(function) };
     function(captured, mailbox);
 }
 
 #[cfg(test)]
 mod tests {
     use lunatic_test::test;
-    use std::time::Duration;
+    use core::time::Duration;
 
     use super::*;
     use crate::{sleep, Mailbox};

@@ -1,4 +1,6 @@
-use std::marker::PhantomData;
+use core::marker::PhantomData;
+use alloc::string::String;
+use crate::alloc::borrow::ToOwned;
 
 use crate::{
     host,
@@ -264,13 +266,13 @@ fn starter<T>(
     T: AbstractProcess,
 {
     let entry: fn(this: ProcessRef<T>, arg: T::Arg) -> T::State =
-        unsafe { std::mem::transmute(entry) };
+        unsafe { core::mem::transmute(entry) };
     let this = unsafe { ProcessRef::from(host::api::process::this()) };
 
     // Register name
     let name = if let Some(name) = name {
         // Encode type information in name
-        let name = format!("{} + ProcessRef + {}", name, std::any::type_name::<T>());
+        let name = alloc::format!("{} + ProcessRef + {}", name, core::any::type_name::<T>());
         unsafe { host::api::registry::put(name.as_ptr(), name.len(), this.process.id()) };
         Some(name)
     } else {
@@ -288,12 +290,12 @@ fn starter<T>(
         match dispatcher {
             Ok(dispatcher) => match dispatcher {
                 Sendable::Message(handler) => {
-                    let handler: fn(state: &mut T::State) = unsafe { std::mem::transmute(handler) };
+                    let handler: fn(state: &mut T::State) = unsafe { core::mem::transmute(handler) };
                     handler(&mut state);
                 }
                 Sendable::Request(handler, sender) => {
                     let handler: fn(state: &mut T::State, sender: Process<()>) =
-                        unsafe { std::mem::transmute(handler) };
+                        unsafe { core::mem::transmute(handler) };
                     handler(&mut state, sender);
                 }
                 Sendable::Shutdown => {
@@ -358,7 +360,7 @@ impl<T> ProcessRef<T> {
     }
 
     pub fn lookup(name: &str) -> Option<Self> {
-        let name = format!("{} + ProcessRef + {}", name, std::any::type_name::<T>());
+        let name = alloc::format!("{} + ProcessRef + {}", name, core::any::type_name::<T>());
         let mut id = 0;
         let result = unsafe { host::api::registry::get(name.as_ptr(), name.len(), &mut id) };
         if result == 0 {
@@ -520,8 +522,8 @@ impl<T> PartialEq for ProcessRef<T> {
     }
 }
 
-impl<T> std::fmt::Debug for ProcessRef<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<T> core::fmt::Debug for ProcessRef<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ProcessRef")
             .field("uuid", &self.uuid())
             .finish()
@@ -531,7 +533,7 @@ impl<T> std::fmt::Debug for ProcessRef<T> {
 #[cfg(test)]
 mod tests {
     use lunatic_test::test;
-    use std::time::Duration;
+    use core::time::Duration;
 
     use super::*;
     use crate::sleep;
