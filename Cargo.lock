@@ -4,8 +4,8 @@ version = 3
 
 [[package]]
 name = "bincode2"
-version = "2.0.3"
-source = "git+https://github.com/jredrado/bincode2.git?branch=master#a5e199bbc840e8677d6a8107a7dcac7c2c2ab42f"
+version = "2.0.4"
+source = "git+https://github.com/jredrado/bincode2.git?branch=master#43c5fb6f29e42a757ab989a3b6ca83c4729d36cc"
 dependencies = [
  "byteorder_bare-io",
  "core2",
@@ -15,19 +15,24 @@ dependencies = [
 
 [[package]]
 name = "byteorder_bare-io"
-version = "0.1.0+byteorder.1.3.4"
-source = "git+https://github.com/jredrado/byteorder.git?branch=update-to-core2#96116fe8c65fe9a8b1d1f7ad1f025ec65aafbb90"
+version = "0.3.0+byteorder.1.3.4"
+source = "git+https://github.com/jredrado/byteorder.git?branch=update-to-core2#2b848f7ec7651d83a0005b578d636633aa320f6f"
 dependencies = [
  "core2",
 ]
 
 [[package]]
 name = "core2"
-version = "0.4.0"
-source = "git+https://github.com/bbqsrc/core2?branch=main#545e84bcb0f235b12e21351e0c69767958efe2a7"
+version = "0.3.5"
+source = "git+https://github.com/jredrado/core2?branch=main#de5fde56c113bc385b261cb5c940b9b4f8e675a2"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "ioslice"
+version = "0.6.0-alpha.2"
+source = "git+https://github.com/jredrado/ioslice-rs.git?branch=master#a39f1a64f813c4e390f1abe2779491e216be26ea"
 
 [[package]]
 name = "lunatic"
@@ -35,6 +40,7 @@ version = "0.9.1"
 dependencies = [
  "bincode2",
  "core2",
+ "ioslice",
  "lunatic-macros",
  "lunatic-test",
  "no-std-net",
@@ -78,11 +84,11 @@ checksum = "0c520e05135d6e763148b6426a837e239041653ba7becd2e538c076c738025fc"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.38"
+version = "1.0.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9027b48e9d4c9175fa2218adf3557f91c1137021739951d4932f5f8268ac48aa"
+checksum = "c54b25569025b7fc9651de43004ae593a75ad88543b17178aa5e1b9c4f15f56f"
 dependencies = [
- "unicode-xid",
+ "unicode-ident",
 ]
 
 [[package]]
@@ -116,19 +122,19 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.94"
+version = "1.0.96"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a07e33e919ebcd69113d5be0e4d70c5707004ff45188910106854f38b960df4a"
+checksum = "0748dd251e24453cb8717f0354206b91557e4ec8703673a4b30208f2abaf1ebf"
 dependencies = [
  "proc-macro2",
  "quote",
- "unicode-xid",
+ "unicode-ident",
 ]
 
 [[package]]
 name = "thiserror_core2"
 version = "2.0.0"
-source = "git+https://github.com/jredrado/thiserror-core2.git#c8efb0b445a0204f8e8e04e0b96b1b1c26a56cee"
+source = "git+https://github.com/jredrado/thiserror-core2.git#cccace45cd9d083175fe68c904765201c7f84cce"
 dependencies = [
  "core2",
  "thiserror_core2-impl",
@@ -137,7 +143,7 @@ dependencies = [
 [[package]]
 name = "thiserror_core2-impl"
 version = "2.0.0"
-source = "git+https://github.com/jredrado/thiserror-core2.git#c8efb0b445a0204f8e8e04e0b96b1b1c26a56cee"
+source = "git+https://github.com/jredrado/thiserror-core2.git#cccace45cd9d083175fe68c904765201c7f84cce"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -145,7 +151,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "unicode-xid"
-version = "0.2.3"
+name = "unicode-ident"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "957e51f3646910546462e67d5f7599b9e4fb8acdd304b087a6494730f9eebf04"
+checksum = "d22af068fba1eb5edcb4aea19d382b2a3deb4c8f9d475c589b6ada9e0fd493ee"

@@ -9,7 +9,7 @@ use bincode2 as bincode;
 
 #[derive(Error, Debug)]
 pub enum EncodeError {
-    #[error("serialization to Bincode failed: {0}")]
+    #[error("serialization to Bincode failed:")]
     Bincode(#[from] bincode::Error),
     //#[error("serialization to MessagePack failed: {0}")]
     //MessagePack(#[from] rmp_serde::encode::Error),
@@ -17,13 +17,13 @@ pub enum EncodeError {
     //Json(#[from] serde_json::error::Error),
     //#[error("serialization to Protocol Buffers failed: {0}")]
     //ProtocolBuffers(#[from] protobuf::error::ProtobufError),
-    #[error("serialization failed: {0}")]
+    #[error("serialization failed: ")]
     Custom(String),
 }
 
 #[derive(Error, Debug)]
 pub enum DecodeError {
-    #[error("deserialization from Bincode failed: {0}")]
+    #[error("deserialization from Bincode failed: ")]
     Bincode(#[from] bincode::Error),
     //#[error("deserialization from MessagePack failed: {0}")]
     //MessagePack(#[from] rmp_serde::decode::Error),
@@ -31,7 +31,7 @@ pub enum DecodeError {
     //Json(#[from] serde_json::error::Error),
     //#[error("deserialization from Protocol Buffers failed: {0}")]
     //ProtocolBuffers(#[from] protobuf::error::ProtobufError),
-    #[error("deserialization failed: {0}")]
+    #[error("deserialization failed: ")]
     Custom(String),
 }
 

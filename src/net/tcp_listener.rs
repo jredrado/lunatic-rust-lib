@@ -1,4 +1,4 @@
-use core2::io::{Error, ErrorKind,Result};
+use core2::io::{Error,ErrorKind,Result};
 
 use no_std_net::{SocketAddr,ToSocketAddrError};
 

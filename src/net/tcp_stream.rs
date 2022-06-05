@@ -4,6 +4,7 @@ use core2::io::{Error, ErrorKind, Read, Result, Write};
 use no_std_net::SocketAddr;
 use core::time::Duration;
 
+use ioslice::IoSlice;
 
 use serde::{
     de::{self, Visitor},
@@ -205,12 +206,15 @@ impl TcpStream {
 
 impl Write for TcpStream {
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
+        let slice : IoSlice<ioslice::init_marker::Init> = IoSlice::new(buf);
+        let bufs = &[slice];
+
         let mut nwritten_or_error_id: u64 = 0;
         let result = unsafe {
             host::api::networking::tcp_write_vectored(
                 self.id,
-                buf.as_ptr() as *const u32,
-                buf.len(),
+                bufs.as_ptr() as *const u32,
+                bufs.len(),
                 self.write_timeout,
                 &mut nwritten_or_error_id as *mut u64,
             )
@@ -222,6 +226,7 @@ impl Write for TcpStream {
             Err(Error::new(ErrorKind::Other, ""))
         }
     }
+
 
     fn flush(&mut self) -> Result<()> {
         let mut error_id = 0;
